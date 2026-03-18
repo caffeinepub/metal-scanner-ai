@@ -1,5 +1,5 @@
 // Gemini AI service for metal analysis
-const GEMINI_API_KEY = "AIzaSyCWZr1--ipjjt4MMK6cXxUjZVm8gbv5kMI";
+const GEMINI_API_KEY = "AIzaSyAlnjrjZHgctA7424EwvUuhp8S6Nl-u-Io";
 const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
 
 export interface GeminiMetalResult {
@@ -29,7 +29,6 @@ async function fileToBase64(file: File): Promise<string> {
     const reader = new FileReader();
     reader.onload = () => {
       const result = reader.result as string;
-      // Remove the data URL prefix (e.g. "data:image/jpeg;base64,")
       const base64 = result.split(",")[1];
       resolve(base64);
     };
@@ -138,7 +137,6 @@ Rules:
   const rawText: string =
     data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
-  // Strip markdown code blocks if present
   const cleaned = rawText
     .replace(/```json\s*/gi, "")
     .replace(/```\s*/g, "")
@@ -146,10 +144,8 @@ Rules:
 
   const parsed: GeminiMetalResult = JSON.parse(cleaned);
 
-  // Validate probabilities sum to 100
   const sum = Object.values(parsed.probabilities).reduce((a, b) => a + b, 0);
   if (Math.abs(sum - 100) > 5) {
-    // Normalize
     const scale = 100 / sum;
     for (const key of Object.keys(
       parsed.probabilities,

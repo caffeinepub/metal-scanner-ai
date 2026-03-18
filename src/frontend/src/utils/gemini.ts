@@ -16,33 +16,7 @@ export interface GeminiAnalysisResult {
   visualClues: string[];
 }
 
-const MOCK_RESULTS: GeminiAnalysisResult = {
-  goldProbability: 3,
-  silverProbability: 65,
-  copperProbability: 8,
-  steelProbability: 12,
-  zincProbability: 4,
-  aluminiumProbability: 4,
-  titaniumProbability: 1,
-  nickelProbability: 2,
-  leadProbability: 1,
-  ironProbability: 0,
-  topMetal: "silver",
-  purityRange: "92-95% pure",
-  estimatedValueRange: "$45-$60",
-  confidenceLevel:
-    "High - Strong visual characteristics match sterling silver. Cool white reflectivity and surface texture are definitive indicators.",
-  visualClues: [
-    "Bright white/cool color temperature characteristic of silver",
-    "High reflectivity with near-mirror surface finish",
-    "Minimal oxidation, surface tarnish pattern typical of sterling silver",
-    "Smooth refined texture indicating high-purity metal",
-    "No reddish or warm tones that would indicate copper content",
-    "Color and luster consistent with sterling silver (92.5% Ag)",
-  ],
-};
-
-const GEMINI_API_KEY = "AIzaSyCWZr1--ipjjt4MMK6cXxUjZVm8gbv5kMI";
+const GEMINI_API_KEY = "AIzaSyAlnjrjZHgctA7424EwvUuhp8S6Nl-u-Io";
 
 export async function analyzeMetalImage(
   base64Image: string,
@@ -53,14 +27,6 @@ export async function analyzeMetalImage(
   const apiKey =
     (import.meta.env.VITE_GEMINI_API_KEY as string | undefined) ||
     GEMINI_API_KEY;
-
-  if (!apiKey) {
-    console.warn(
-      "[MetalScanner] Gemini API key not configured. Using demo mode.",
-    );
-    await new Promise((r) => setTimeout(r, 2200));
-    return MOCK_RESULTS;
-  }
 
   const weightText = weightGrams ? ` The object weighs ${weightGrams}g.` : "";
   const dimsText = dimensions ? ` Dimensions: ${dimensions}.` : "";
@@ -93,7 +59,6 @@ export async function analyzeMetalImage(
   const data = await response.json();
   let text: string = data.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
 
-  // Strip any markdown code fences
   text = text
     .replace(/```json\s*/gi, "")
     .replace(/```\s*/gi, "")
